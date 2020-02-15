@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\loginUserRequest;
-use App\Http\Requests\registerUserRequest;
+use App\Http\Requests\LoginUserRequest;
+use App\Http\Requests\RegisterUserRequest;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,10 +13,14 @@ class LoginController extends Controller
 {
     public function getLogin()
     {
-        return view('user.login');
+        if (Auth::check()){
+            return redirect()->route('dashboard');
+        }else{
+            return view('user.login');
+        }
     }
 
-    public function login(loginUserRequest $request)
+    public function login(LoginUserRequest $request)
     {
         $request->validated();
 
@@ -30,31 +34,7 @@ class LoginController extends Controller
         }
     }
 
-    public function getRegister()
-    {
-        return view('user.register');
-    }
 
-    public function register(registerUserRequest $request)
-    {
-        $request->validated();
 
-        $user = new User;
 
-        $user->name = $request->name;
-        $user->password = Hash::make($request->password);
-        $user->email = $request->email;
-        $user->cpf = $request->cpf;
-
-        $user->save();
-
-        return redirect()->route('getLogin')->with('success', 'Cadastrado com sucesso!');
-    }
-
-    public function dashboard()
-    {
-        $user = Auth::user();
-
-        return view('user.dashboard', ['user' => $user]);
-    }
 }
